@@ -1,18 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
     // Start is called before the first frame update
     Rigidbody2D rb;
+    Counter counter_script;
+    public GameObject spawner;
+    private Spawner sp_script;
     [SerializeField] float jumpForce;
     bool gameover = false;
     bool grounded = false;
     public texturescript textureScript;
     public float min_spawn_time;
     public float mix_spawn_time;
-    public GameObject[] objects ;
+    //public GameObject[] objects ;
     public bool con;
 
  
@@ -32,9 +36,11 @@ public class Player : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        objects = GameObject.FindGameObjectsWithTag("obstacle");
-        con = true;
-        spawn();
+        sp_script = spawner.GetComponent<Spawner>();
+        counter_script = GetComponent<Counter>();
+        //objects = GameObject.FindGameObjectsWithTag("obstacle");
+        //con = true;
+        //spawn();
 
         
     }
@@ -71,52 +77,25 @@ public class Player : MonoBehaviour
 
             }
         
-            stopobstacles();
-            con = false;
+            
+            //con = false;
+            sp_script.shouldContinue = false;
+           // stopobstacles();
+           SceneManager.LoadSceneAsync(2);
             
 
         }
-
-
-    }
-     public void stopobstacles(){
-        GameObject[] obstacles = GameObject.FindGameObjectsWithTag("obstacle");
-        if(obstacles != null){
-            foreach (GameObject o in obstacles)
-           {
-            o.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-            Destroy(o);
-           }
-
+        if(collision.gameObject.tag == "Collectable"){
+            Destroy(collision.gameObject);
+            counter_script.score_update();
         }
-        else{
-           Debug.Log("object doesn't exist");
-        }
-        
-        
-    }
-    // ienumarator is custom itarator 
-    IEnumerator spawn(){
-        float waittime = 1f;
-        
-
-        while(con){
-            create_objects();
-            yield return new WaitForSeconds(waittime);
-        }
-    }
-
-    void create_objects(){
-        // generating a random number index  the obstecle array 
-        int random = Random.Range(0,objects.Length);
-        // quterian.identiy adds zero rotation by default
-        
-        Vector2 position = new Vector2(transform.position.x,transform.position.y);
-        Vector2 spawnpoint = position + Vector2.right * 1.0f;
-
-        Instantiate(objects[random],position,Quaternion.identity);
 
 
     }
+  
+    
+   
+
+   
    
 }
